@@ -10,7 +10,7 @@
   var HORNY = window.HORNY_PAS || "DOPRAVA ZDARMA NAD 100 € ✦ LIMITED DROP ✦ SK / CZ ✦ @hnrd.worldwide";
   var SPODNY = window.SPODNY_PAS || "HNRD WORLDWIDE ✦ @hnrd.worldwide ✦ LIMITED DROP ✦ REFLEXNÁ VÝŠIVKA ✦ ";
   var IGP = window.IG_POSTS || [];
-  if(window.FARBA_POZADIA) document.documentElement.style.setProperty('--bg', window.FARBA_POZADIA);
+  if(window.FARBA_POZADIA){var bg=(''+window.FARBA_POZADIA).trim();if(/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(bg))bg='#'+bg;document.documentElement.style.setProperty('--bg',bg);}
   var HOME = (location.pathname==='/' || location.pathname==='' || location.pathname==='/index.html');
   var FALLBACK = "https://cdn.myshoptet.com/usr/www.hnrdworldwide.com/user/shop/big/52_hnrd-hoodie-black-white-reflective.png";
   // záložné fotky do feedu, ak IG_POSTS je prázdny

@@ -13,15 +13,15 @@ small,.code,.availability,.parameter,.btn,.navigation-in .menu-item,.footer,.bre
 .p{border-color:var(--line);background-color:rgba(246,244,239,.55);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);border-radius:14px;transition:background .3s,transform .3s}
 .p:hover{background-color:rgba(234,231,223,.75)}
 .p .image img{transition:transform .5s}.p:hover .image img{transform:scale(1.05)}
-.btn,.add-to-cart-button,.btn-cart,.btn-primary,.btn-conversion,button.add-to-cart-button{background:var(--ink)!important;color:var(--bg)!important;border:none!important;border-radius:30px!important;letter-spacing:.16em;text-transform:uppercase;transition:.25s}
+.btn,.add-to-cart-button,.btn-cart,.btn-primary,.btn-conversion,button.add-to-cart-button{background-color:var(--ink)!important;color:#f7f5f1!important;border:none!important;border-radius:30px!important;letter-spacing:.16em;text-transform:uppercase;transition:.25s}
 .btn:hover,.add-to-cart-button:hover,.btn-cart:hover,.btn-primary:hover,.btn-conversion:hover{letter-spacing:.24em;opacity:.9}
 .btn-secondary,.btn.ghost{background:transparent!important;color:var(--ink)!important;border:1px solid var(--ink)!important;border-radius:30px!important}
-#hnrd-announce{position:relative;z-index:50;background:var(--ink);color:var(--bg);height:30px;display:flex;align-items:center;overflow:hidden}
+#hnrd-announce{position:relative;z-index:50;background:var(--ink);color:#f7f5f1;height:30px;display:flex;align-items:center;overflow:hidden}
 #hnrd-announce .t{display:flex;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.24em;animation:hnrdscroll 30s linear infinite}
 #hnrd-announce .t span{padding:0 26px}
 @keyframes hnrdscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(max-width:760px){#hnrd-announce{display:none}}
-.hnrd-marq{background:var(--ink);color:var(--bg);overflow:hidden;padding:10px 0;margin:10px 0}
+.hnrd-marq{background:var(--ink);color:#f7f5f1;overflow:hidden;padding:10px 0;margin:10px 0}
 .hnrd-marq .t{display:flex;white-space:nowrap;font-family:'Anton',sans-serif;font-size:clamp(18px,2.6vw,30px);animation:hnrdscroll 26s linear infinite}
 .hnrd-marq .t span{padding:0 20px}
 .hnrd-marq,.hnrd-refl,.hnrd-ig{position:relative;box-sizing:border-box}
@@ -57,7 +57,7 @@ small,.code,.availability,.parameter,.btn,.navigation-in .menu-item,.footer,.bre
 .hnrd-im model-viewer{width:100%;height:100%;background:transparent}
 .hnrd-halo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70%;height:70%;border-radius:50%;background:radial-gradient(circle,rgba(150,170,205,.22),transparent 62%);filter:blur(44px);pointer-events:none}
 .hnrd-enter{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.42em;color:var(--ink);background:transparent;border:1px solid var(--ink);padding:15px 34px;border-radius:44px;cursor:pointer;transition:.3s;animation:hnrdpulse 2.2s ease-in-out infinite}
-.hnrd-enter:hover{background:var(--ink);color:var(--bg)}
+.hnrd-enter:hover{background:var(--ink);color:#f7f5f1}
 @keyframes hnrdpulse{0%,100%{box-shadow:0 0 0 0 rgba(180,200,230,0)}50%{box-shadow:0 0 34px 3px rgba(180,200,230,.18)}}
 .hnrd-soon{display:none;font-family:'Anton',sans-serif;font-size:clamp(30px,7vw,60px);letter-spacing:.02em;line-height:.9;color:var(--ink)}
 .hnrd-soon small{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.34em;color:var(--dim);margin-top:12px;text-transform:uppercase}
