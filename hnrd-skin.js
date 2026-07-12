@@ -1,22 +1,18 @@
-/* ================= HNRD WORLDWIDE — skin logika pre Shoptet =================
-   Nahraj tento súbor na GitHub k logu (borishnrd.github.io/Borisko/hnrd-skin.js).
-
-   ┌─────────────────────────────────────────────────────────────────────┐
-   │  INSTAGRAM POSTY: pridávaj sem. Každý post = { img, link }.           │
-   │  img  = URL obrázka (napr. fotka nahratá do Shoptetu alebo z IG)      │
-   │  link = URL konkrétneho príspevku na Instagrame                        │
-   │  Keď necháš zoznam prázdny [], feed použije fotky produktov.           │
-   └─────────────────────────────────────────────────────────────────────┘ */
-var IG_POSTS = [
-  // { img:"https://www.hnrdworldwide.com/user/documents/upload/mojafotka.jpg", link:"https://www.instagram.com/p/XXXX/" },
-];
+/* HNRD WORLDWIDE — skin logika (mechanika). NETREBA upravovať.
+   Texty, posty, farbu pozadia a režim obchodu nastavuješ v SHOPTETE
+   (pole Pätička, hore). Tento súbor len číta tie hodnoty. */
 
 (function(){
   var GLB = "https://borishnrd.github.io/Borisko/hnrd.glb";
   var IG  = "https://www.instagram.com/hnrd.worldwide/";
   var CDN = "https://cdn.myshoptet.com/usr/www.hnrdworldwide.com/user/shop/big/";
   var MODE = (typeof window.SHOP_MODE!=="undefined") ? window.SHOP_MODE : "live";
+  var HORNY = window.HORNY_PAS || "DOPRAVA ZDARMA NAD 100 € ✦ LIMITED DROP ✦ SK / CZ ✦ @hnrd.worldwide";
+  var SPODNY = window.SPODNY_PAS || "HNRD WORLDWIDE ✦ @hnrd.worldwide ✦ LIMITED DROP ✦ REFLEXNÁ VÝŠIVKA ✦ ";
+  var IGP = window.IG_POSTS || [];
+  if(window.FARBA_POZADIA) document.documentElement.style.setProperty('--bg', window.FARBA_POZADIA);
   var HOME = (location.pathname==='/' || location.pathname==='' || location.pathname==='/index.html');
+  var FALLBACK = "https://cdn.myshoptet.com/usr/www.hnrdworldwide.com/user/shop/big/52_hnrd-hoodie-black-white-reflective.png";
   // záložné fotky do feedu, ak IG_POSTS je prázdny
   var FEED = ["52_hnrd-hoodie-black-white-reflective.png","49_hnrd-hoodie-black-black-reflective.png","47_hnrd-hoodie-black-white.png","44_hnrd-hoodie-black-black.png","57_hnrd-tee-black.jpg","54_hnrd-tee-white.jpg","60_hnrd-cap-side.jpg","47_hnrd-hoodie-black-white.png"];
 
@@ -31,7 +27,7 @@ var IG_POSTS = [
   function insLogo(){if(!HOME)return;var m=document.querySelector('main');if(m&&shopLogo){shopLogo.style.display='block';m.insertBefore(shopLogo,m.firstChild);}}
 
   /* Announce pás — hore, cez skript */
-  function ann(){if(document.getElementById('hnrd-announce'))return;var b=document.createElement('div');b.id='hnrd-announce';var s="DOPRAVA ZDARMA NAD 100 € ✦ LIMITED DROP ✦ SK / CZ ✦ @hnrd.worldwide";b.innerHTML='<div class="t"><span>'+s+'</span><span>'+s+'</span></div>';document.body.insertBefore(b,document.body.firstChild);}
+  function ann(){if(document.getElementById('hnrd-announce'))return;var b=document.createElement('div');b.id='hnrd-announce';var s=HORNY;b.innerHTML='<div class="t"><span>'+s+'</span><span>'+s+'</span></div>';document.body.insertBefore(b,document.body.firstChild);}
 
   /* Roztiahnutie pásov na presnú šírku obrazovky (bez posunu, aj s posuvníkom) */
   function bleed(){
@@ -49,7 +45,7 @@ var IG_POSTS = [
     var m=document.querySelector('main'); if(!m) return;
     if(!document.getElementById('hnrdMarq')){
       var mq=document.createElement('div');mq.className='hnrd-marq';mq.id='hnrdMarq';
-      var t="HNRD WORLDWIDE ✦ @hnrd.worldwide ✦ LIMITED DROP ✦ REFLEXNÁ VÝŠIVKA ✦ ";
+      var t=SPODNY;
       mq.innerHTML='<div class="t"><span>'+t+t+'</span><span>'+t+t+'</span></div>';
       m.appendChild(mq);
     }
@@ -62,9 +58,9 @@ var IG_POSTS = [
       s.querySelectorAll('.rc').forEach(function(rc){rc.addEventListener('mousemove',function(e){var r=rc.getBoundingClientRect();rc.style.setProperty('--mx',(e.clientX-r.left)+'px');rc.style.setProperty('--my',(e.clientY-r.top)+'px');});});
     }
     if(HOME && !document.getElementById('hnrdIg')){
-      var posts = IG_POSTS.length ? IG_POSTS : FEED.map(function(u){return {img:CDN+u,link:IG};});
+      var posts = IGP.length ? IGP : FEED.map(function(u){return {img:CDN+u,link:IG};});
       var g=document.createElement('section');g.className='hnrd-ig';g.id='hnrdIg';
-      g.innerHTML='<h2>FEED</h2><div class="hnrd-igg">'+posts.slice(0,8).map(function(p){return '<a class="igi" href="'+(p.link||IG)+'" target="_blank" rel="noopener"><img src="'+p.img+'" loading="lazy" alt="HNRD Instagram"><span class="o">OPEN ↗</span></a>';}).join('')+'</div>';
+      g.innerHTML='<h2>FEED</h2><div class="hnrd-igg">'+posts.slice(0,8).map(function(p){return '<a class="igi" href="'+(p.link||IG)+'" target="_blank" rel="noopener"><img src="'+(p.img||FALLBACK)+'" loading="lazy" alt="HNRD Instagram" onerror="this.onerror=null;this.src=\''+FALLBACK+'\'"><span class="o">OPEN &#8599;</span></a>';}).join('')+'</div>';
       m.appendChild(g);
     }
     bleed();
@@ -72,7 +68,6 @@ var IG_POSTS = [
 
   /* Točiace 3D logo v hlavičke — len na titulnej */
   function navLogo(){
-    if(!HOME) return;
     var hl=document.querySelector('.header-logo img,.logo img,#logo img,header a img[src*="logo"]');
     if(!hl || document.getElementById('hnrdNav')) return;
     var w=hl.offsetWidth||150, h=hl.offsetHeight||56;
