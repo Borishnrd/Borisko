@@ -105,6 +105,24 @@
   /* "Späť do obchodu" → malá šípka */
   function backBtn(){[].forEach.call(document.querySelectorAll('a,button'),function(el){if(!el.children.length&&/^\s*Späť do obchodu\s*$/i.test(el.textContent||'')){el.title='Späť do obchodu';el.textContent='←';el.style.fontSize='22px';el.style.lineHeight='1';el.style.textDecoration='none';}});}
 
+  /* čierne odznaky na kartách vybraných produktov (podľa URL) */
+  function badges(){
+    var list=window.ODZNAKY||[]; if(!list.length)return;
+    [].forEach.call(document.querySelectorAll('.p,.product'),function(card){
+      if(card.querySelector('.hnrd-badge'))return;
+      var a=card.querySelector('a[href]'); if(!a)return;
+      var href=a.getAttribute('href')||'';
+      for(var i=0;i<list.length;i++){
+        var key=((list[i].produkt||list[i].url||'')+'').trim();
+        if(key && href.indexOf(key)>-1){
+          if(getComputedStyle(card).position==='static')card.style.position='relative';
+          var b=document.createElement('span');b.className='hnrd-badge';b.textContent=(list[i].text||'NEW');
+          card.appendChild(b); break;
+        }
+      }
+    });
+  }
+
   /* tenký promo pás navrchu obsahu (pod menu) — viditeľný hneď aj na mobile */
   function ann(){
     var m=document.querySelector('main'); if(!m||document.getElementById('hnrd-announce'))return;
@@ -115,7 +133,7 @@
   }
 
   function boot(){
-    navLogo(); backBtn(); ann();
+    navLogo(); backBtn(); ann(); badges();
     var m=document.querySelector('main'); if(!m) return;
     if(HOME){
       if(!document.getElementById('hnrdMarq')){ var mq=makeStrip('hnrdMarq'); m.appendChild(mq); fillStrip(mq,SPODNY,RY_S); }

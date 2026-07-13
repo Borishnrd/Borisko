@@ -13,6 +13,7 @@ small,.code,.availability,.parameter,.btn,.navigation-in .menu-item,.footer,.bre
 .p{border-color:var(--line);background-color:rgba(246,244,239,.55);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);border-radius:14px;transition:background .3s,transform .3s}
 .p:hover{background-color:rgba(234,231,223,.75)}
 .p .image img{transition:transform .5s}.p:hover .image img{transform:scale(1.05)}
+.hnrd-badge{position:absolute;top:12px;left:12px;z-index:4;background:var(--ink);color:#f7f5f1;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;padding:5px 9px;border-radius:20px;text-transform:uppercase;pointer-events:none}
 .btn,.add-to-cart-button,.btn-cart,.btn-primary,.btn-conversion,button.add-to-cart-button{background-color:var(--ink)!important;color:#f7f5f1!important;border:none!important;border-radius:30px!important;letter-spacing:.16em;text-transform:uppercase;transition:.25s}
 .btn:hover,.add-to-cart-button:hover,.btn-cart:hover,.btn-primary:hover,.btn-conversion:hover{letter-spacing:.24em;opacity:.9}
 .btn-secondary,.btn.ghost{background:transparent!important;color:var(--ink)!important;border:1px solid var(--ink)!important;border-radius:30px!important}
