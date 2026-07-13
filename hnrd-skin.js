@@ -64,7 +64,8 @@
 
   function reflective(m){
     if(document.getElementById('hnrdRefl'))return;
-    var cards=R_KARTY.map(function(k){var img=k.img||FALLBACK;return '<a class="rc" href="'+(k.link||'#')+'"><img class="g" src="'+img+'"><img class="bl" src="'+img+'" aria-hidden="true"><span class="cap"><b>'+(k.titul||'')+'</b><small>'+(k.popis||'')+'</small></span></a>';}).join('');
+    var DEF=[i1,i2];
+    var cards=R_KARTY.map(function(k,idx){var img=k.img||DEF[idx]||FALLBACK;return '<a class="rc" href="'+(k.link||'#')+'"><img class="g" src="'+img+'"><img class="bl" src="'+img+'" aria-hidden="true"><span class="cap"><b>'+(k.titul||'')+'</b><small>'+(k.popis||'')+'</small></span></a>';}).join('');
     var s=document.createElement('section');s.className='hnrd-refl';s.id='hnrdRefl';
     s.innerHTML='<div class="rh"><h2>'+R_NAD+'</h2><div class="m">'+R_META+'</div></div><div class="hnrd-rg">'+cards+'</div>';
     m.appendChild(s);
@@ -100,12 +101,9 @@
   function boot(){
     navLogo(); backBtn();
     var m=document.querySelector('main'); if(!m) return;
-    /* horný pás — na titulnej sa dostane pod veľké logo (logo sa vkladá pred neho) */
-    if(!document.getElementById('hnrdTop')){
-      var txt = PRODUCT ? PRODUKT : HORNY;
-      m.insertBefore(makeStrip(txt, RY_H, 'hnrdTop'), m.firstChild);
-    }
     if(HOME){
+      /* horný pás pod veľkým logom (logo sa vkladá pred neho) */
+      if(!document.getElementById('hnrdTop')) m.insertBefore(makeStrip(HORNY, RY_H, 'hnrdTop'), m.firstChild);
       if(!document.getElementById('hnrdMarq')) m.appendChild(makeStrip(SPODNY, RY_S, 'hnrdMarq'));
       reflective(m);
       feed(m);
