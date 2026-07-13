@@ -123,12 +123,16 @@
     });
   }
 
-  /* tenký promo pás navrchu obsahu (pod menu) — viditeľný hneď aj na mobile */
+  /* promo pás: na PC úplne hore nad menu, na mobile v obsahu pod menu
+     (aby ho fixná mobilná hlavička neprekryla) */
   function ann(){
-    var m=document.querySelector('main'); if(!m||document.getElementById('hnrd-announce'))return;
+    if(document.getElementById('hnrd-announce'))return;
+    var mobile=window.innerWidth<760, parent, ref;
+    if(mobile){ parent=document.querySelector('main'); if(!parent)return; ref=parent.firstChild; }
+    else { parent=document.body; ref=document.body.firstChild; }
     var b=document.createElement('div');b.id='hnrd-announce';
     b.innerHTML='<div class="t"><span></span><span></span></div>';
-    m.insertBefore(b,m.firstChild);
+    parent.insertBefore(b,ref);
     fillStrip(b,HORNY,RY_H);
   }
 
