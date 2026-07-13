@@ -83,7 +83,7 @@
     if(document.getElementById('hnrdIg'))return;
     var posts = IGP.length ? IGP : ["52_hnrd-hoodie-black-white-reflective.png","49_hnrd-hoodie-black-black-reflective.png","47_hnrd-hoodie-black-white.png","44_hnrd-hoodie-black-black.png","57_hnrd-tee-black.jpg","54_hnrd-tee-white.jpg","60_hnrd-cap-side.jpg","44_hnrd-hoodie-black-black.png"].map(function(u){return {img:CDN+u,link:IG};});
     var g=document.createElement('section');g.className='hnrd-ig';g.id='hnrdIg';
-    g.innerHTML='<h2>FEED</h2><div class="hnrd-igg">'+posts.slice(0,8).map(function(p){return '<a class="igi" href="'+(p.link||IG)+'" target="_blank" rel="noopener"><img src="'+(p.img||FALLBACK)+'" loading="lazy" alt="HNRD Instagram" onerror="this.onerror=null;this.src=\''+FALLBACK+'\'"><span class="o">OPEN &#8599;</span></a>';}).join('')+'</div>';
+    g.innerHTML='<h2>FEED</h2><div class="hnrd-igg">'+posts.slice(0,12).map(function(p){return '<a class="igi" href="'+(p.link||IG)+'" target="_blank" rel="noopener"><img src="'+(p.img||FALLBACK)+'" loading="lazy" alt="HNRD Instagram" onerror="this.onerror=null;this.src=\''+FALLBACK+'\'"><span class="o">OPEN &#8599;</span></a>';}).join('')+'</div>';
     m.appendChild(g);
   }
 
@@ -108,7 +108,8 @@
   /* čierne odznaky na kartách vybraných produktov (podľa URL) */
   function badges(){
     var list=window.ODZNAKY||[]; if(!list.length)return;
-    [].forEach.call(document.querySelectorAll('.p,.product'),function(card){
+    var cards=document.querySelectorAll('.p'); if(!cards.length)cards=document.querySelectorAll('.product');
+    [].forEach.call(cards,function(card){
       if(card.querySelector('.hnrd-badge'))return;
       var a=card.querySelector('a[href]'); if(!a)return;
       var href=a.getAttribute('href')||'';
@@ -136,8 +137,26 @@
     fillStrip(b,HORNY,RY_H);
   }
 
+  /* zoradí veľkosti XS→XXL (detail produktu, aj dynamicky renderované) */
+  var SZ=['XXS','XS','S','M','L','XL','XXL','3XL','XXXL','4XL'];
+  function szN(t){return (t||'').replace(/\s+/g,'').toUpperCase();}
+  function szRank(t){var i=SZ.indexOf(szN(t));return i<0?900:i;}
+  function szIs(t){return SZ.indexOf(szN(t))>-1;}
+  function sortSizes(root){
+    var scope=(root&&root.querySelectorAll)?root:document;
+    [].forEach.call(scope.querySelectorAll('select:not([data-hs])'),function(sel){
+      var o=[].slice.call(sel.options);
+      if(o.filter(function(x){return szIs(x.textContent);}).length>=2){sel.setAttribute('data-hs','1');o.sort(function(a,b){return szRank(a.textContent)-szRank(b.textContent);}).forEach(function(x){sel.appendChild(x);});}
+    });
+    [].forEach.call(scope.querySelectorAll('.parameter-values:not([data-hs]),[class*="variant"]:not([data-hs]),[class*="param"]:not([data-hs])'),function(box){
+      var k=[].slice.call(box.children); if(k.length<2)return;
+      var s=k.filter(function(el){return szIs(el.textContent);});
+      if(s.length>=2 && s.length>=k.length-1){box.setAttribute('data-hs','1');s.sort(function(a,b){return szRank(a.textContent)-szRank(b.textContent);}).forEach(function(el){box.appendChild(el);});}
+    });
+  }
+
   function boot(){
-    navLogo(); backBtn(); ann(); badges();
+    navLogo(); backBtn(); ann(); badges(); sortSizes();
     var m=document.querySelector('main'); if(!m) return;
     if(HOME){
       if(!document.getElementById('hnrdMarq')){ var mq=makeStrip('hnrdMarq'); m.appendChild(mq); fillStrip(mq,SPODNY,RY_S); }
@@ -147,6 +166,7 @@
     bleed();
   }
   if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
+  try{ new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){for(var j=0;j<ms[i].addedNodes.length;j++){var n=ms[i].addedNodes[j];if(n.nodeType===1)sortSizes(n);}}}).observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
 
   /* režim otvorené / zatvorené */
   if(MODE==="lock"){
