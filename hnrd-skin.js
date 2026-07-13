@@ -40,20 +40,27 @@
   function setVH(){var h=(window.visualViewport&&window.visualViewport.height)?window.visualViewport.height:window.innerHeight;document.documentElement.style.setProperty('--vh',h+'px');}
   setVH(); addEventListener('resize',setVH); addEventListener('orientationchange',setVH);
 
-  function insLogo(){if(!HOME)return;var m=document.querySelector('main');if(m&&shopLogo){shopLogo.style.display='block';m.insertBefore(shopLogo,m.firstChild);}}
+  function insLogo(){if(!HOME)return;var m=document.querySelector('main');if(m&&shopLogo){shopLogo.style.display='block';var bar=document.getElementById('hnrd-announce');if(bar&&bar.parentNode===m){m.insertBefore(shopLogo,bar.nextSibling);}else{m.insertBefore(shopLogo,m.firstChild);}}}
 
-  /* pás s bežiacim textom (text, rýchlosť v sekundách, id) */
-  function makeStrip(text,secs,id){
+  /* prázdny pás */
+  function makeStrip(id){
     var d=document.createElement('div'); d.className='hnrd-marq'; if(id)d.id=id;
-    d.style.setProperty('--sp',(secs||26)+'s');
-    d.innerHTML='<div class="t"><span>'+text+text+'</span><span>'+text+text+'</span></div>';
+    d.innerHTML='<div class="t"><span></span><span></span></div>';
     return d;
+  }
+  /* naplní pás textom tak, aby bežal plynulo bez medzery (opakuje cez celú šírku) */
+  function fillStrip(el,text,secs){
+    var t=el.querySelector('.t'),s1=t.children[0],s2=t.children[1],reps=1;
+    s1.textContent=text;
+    while(s1.offsetWidth < window.innerWidth && reps<40){reps++;s1.textContent=Array(reps+1).join(text);}
+    s2.textContent=s1.textContent;
+    t.style.animationDuration=(secs||26)+'s';
   }
 
   /* roztiahnutie pásov na presnú šírku obrazovky (bez posunu) */
   function bleed(){
     var w=document.documentElement.clientWidth;
-    ['hnrdTop','hnrdMarq','hnrdRefl','hnrdIg'].forEach(function(id){
+    ['hnrd-announce','hnrdMarq','hnrdRefl','hnrdIg'].forEach(function(id){
       var el=document.getElementById(id);if(!el)return;
       el.style.marginLeft='0'; el.style.width='auto';
       var l=el.getBoundingClientRect().left;
@@ -98,20 +105,20 @@
   /* "Späť do obchodu" → malá šípka */
   function backBtn(){[].forEach.call(document.querySelectorAll('a,button'),function(el){if(!el.children.length&&/^\s*Späť do obchodu\s*$/i.test(el.textContent||'')){el.title='Späť do obchodu';el.textContent='←';el.style.fontSize='22px';el.style.lineHeight='1';el.style.textDecoration='none';}});}
 
-  /* tenký promo pás úplne hore (nad menu), na všetkých stránkach, viditeľný aj na mobile */
+  /* tenký promo pás navrchu obsahu (pod menu) — viditeľný hneď aj na mobile */
   function ann(){
-    if(document.getElementById('hnrd-announce'))return;
+    var m=document.querySelector('main'); if(!m||document.getElementById('hnrd-announce'))return;
     var b=document.createElement('div');b.id='hnrd-announce';
-    b.innerHTML='<div class="t"><span>'+HORNY+'</span><span>'+HORNY+'</span></div>';
-    document.body.insertBefore(b,document.body.firstChild);
-    var t=b.querySelector('.t'); if(t) t.style.animationDuration=RY_H+'s';
+    b.innerHTML='<div class="t"><span></span><span></span></div>';
+    m.insertBefore(b,m.firstChild);
+    fillStrip(b,HORNY,RY_H);
   }
 
   function boot(){
     navLogo(); backBtn(); ann();
     var m=document.querySelector('main'); if(!m) return;
     if(HOME){
-      if(!document.getElementById('hnrdMarq')) m.appendChild(makeStrip(SPODNY, RY_S, 'hnrdMarq'));
+      if(!document.getElementById('hnrdMarq')){ var mq=makeStrip('hnrdMarq'); m.appendChild(mq); fillStrip(mq,SPODNY,RY_S); }
       reflective(m);
       feed(m);
     }
