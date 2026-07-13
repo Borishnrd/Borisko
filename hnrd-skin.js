@@ -98,12 +98,19 @@
   /* "Späť do obchodu" → malá šípka */
   function backBtn(){[].forEach.call(document.querySelectorAll('a,button'),function(el){if(!el.children.length&&/^\s*Späť do obchodu\s*$/i.test(el.textContent||'')){el.title='Späť do obchodu';el.textContent='←';el.style.fontSize='22px';el.style.lineHeight='1';el.style.textDecoration='none';}});}
 
+  /* tenký promo pás úplne hore (nad menu), na všetkých stránkach, viditeľný aj na mobile */
+  function ann(){
+    if(document.getElementById('hnrd-announce'))return;
+    var b=document.createElement('div');b.id='hnrd-announce';
+    b.innerHTML='<div class="t"><span>'+HORNY+'</span><span>'+HORNY+'</span></div>';
+    document.body.insertBefore(b,document.body.firstChild);
+    var t=b.querySelector('.t'); if(t) t.style.animationDuration=RY_H+'s';
+  }
+
   function boot(){
-    navLogo(); backBtn();
+    navLogo(); backBtn(); ann();
     var m=document.querySelector('main'); if(!m) return;
     if(HOME){
-      /* horný pás pod veľkým logom (logo sa vkladá pred neho) */
-      if(!document.getElementById('hnrdTop')) m.insertBefore(makeStrip(HORNY, RY_H, 'hnrdTop'), m.firstChild);
       if(!document.getElementById('hnrdMarq')) m.appendChild(makeStrip(SPODNY, RY_S, 'hnrdMarq'));
       reflective(m);
       feed(m);
