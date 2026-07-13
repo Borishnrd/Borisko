@@ -1,20 +1,36 @@
 /* HNRD WORLDWIDE — skin logika (mechanika). NETREBA upravovať.
-   Texty, posty, farbu pozadia a režim obchodu nastavuješ v SHOPTETE
-   (pole Pätička, hore). Tento súbor len číta tie hodnoty. */
+   Texty, posty, farby, rýchlosti a režim nastavuješ v SHOPTETE (Pätička, hore).
+   Tento súbor len číta tie hodnoty. */
 
 (function(){
   var GLB = "https://borishnrd.github.io/Borisko/hnrd.glb";
   var IG  = "https://www.instagram.com/hnrd.worldwide/";
   var CDN = "https://cdn.myshoptet.com/usr/www.hnrdworldwide.com/user/shop/big/";
-  var MODE = (typeof window.SHOP_MODE!=="undefined") ? window.SHOP_MODE : "live";
-  var HORNY = window.HORNY_PAS || "DOPRAVA ZDARMA NAD 100 € ✦ LIMITED DROP ✦ SK / CZ ✦ @hnrd.worldwide";
+  var FALLBACK = CDN+"52_hnrd-hoodie-black-white-reflective.png";
+
+  /* ---- načítanie nastavení zo Shoptetu (s predvolenými hodnotami) ---- */
+  var MODE   = (typeof window.SHOP_MODE!=="undefined") ? window.SHOP_MODE : "live";
+  var HORNY  = window.HORNY_PAS  || "DOPRAVA ZDARMA NAD 100 € ✦ LIMITED DROP ✦ SK / CZ ✦ @hnrd.worldwide ✦ ";
   var SPODNY = window.SPODNY_PAS || "HNRD WORLDWIDE ✦ @hnrd.worldwide ✦ LIMITED DROP ✦ REFLEXNÁ VÝŠIVKA ✦ ";
-  var IGP = window.IG_POSTS || [];
+  var PRODUKT= window.PRODUKT_PAS|| "VÝROBA NA OBJEDNÁVKU ✦ ČAKACIA DOBA cca 14 DNÍ ✦ ĎAKUJEME ZA TRPEZLIVOSŤ ✦ ";
+  var RY_H   = parseFloat(window.RYCHLOST_HORNY)  || 30;   /* sekundy: viac = pomalšie */
+  var RY_S   = parseFloat(window.RYCHLOST_SPODNY) || 26;
+  var IGP    = window.IG_POSTS || [];
   if(window.FARBA_POZADIA){var bg=(''+window.FARBA_POZADIA).trim();if(/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(bg))bg='#'+bg;document.documentElement.style.setProperty('--bg',bg);}
+
+  /* reflexná sekcia – texty aj karty z nastavení */
+  var i1=CDN+"52_hnrd-hoodie-black-white-reflective-zoom.jpg?ff=1&x=1024&y=768&q=85&ts=69ab399a&sg=161563f2";
+  var i2=CDN+"49_hnrd-hoodie-black-black-reflective-zoom.jpg?ff=1&x=1024&y=768&q=85&ts=69ab391e&sg=161563f2";
+  var R = window.REFLECTIVE || {};
+  var R_NAD  = R.nadpis || "REFLECTIVE";
+  var R_META = R.meta   || "SERIES 02<br>GLOWS IN THE DARK";
+  var R_KARTY= (R.karty && R.karty.length) ? R.karty : [
+    {img:i1, link:"/hoodie-hnrd-white-reflective/", titul:"WHITE / REFLECTIVE", popis:"€90 · GLOWS IN THE DARK"},
+    {img:i2, link:"/hoodie-hnrd-black-reflective/", titul:"BLACK / REFLECTIVE", popis:"€90 · GLOWS IN THE DARK"}
+  ];
+
   var HOME = (location.pathname==='/' || location.pathname==='' || location.pathname==='/index.html');
-  var FALLBACK = "https://cdn.myshoptet.com/usr/www.hnrdworldwide.com/user/shop/big/52_hnrd-hoodie-black-white-reflective.png";
-  // záložné fotky do feedu, ak IG_POSTS je prázdny
-  var FEED = ["52_hnrd-hoodie-black-white-reflective.png","49_hnrd-hoodie-black-black-reflective.png","47_hnrd-hoodie-black-white.png","44_hnrd-hoodie-black-black.png","57_hnrd-tee-black.jpg","54_hnrd-tee-white.jpg","60_hnrd-cap-side.jpg","47_hnrd-hoodie-black-white.png"];
+  var PRODUCT = !HOME && !!document.querySelector('.p-detail-inner,.p-detail,.product-detail,[itemprop="offers"],.price-final,.add-to-cart-button');
 
   var landing=document.getElementById('landing-page'),
       shopLogo=document.getElementById('shop-logo'),
@@ -26,13 +42,18 @@
 
   function insLogo(){if(!HOME)return;var m=document.querySelector('main');if(m&&shopLogo){shopLogo.style.display='block';m.insertBefore(shopLogo,m.firstChild);}}
 
-  /* Announce pás — hore, cez skript */
-  function ann(){if(document.getElementById('hnrd-announce'))return;var b=document.createElement('div');b.id='hnrd-announce';var s=HORNY;b.innerHTML='<div class="t"><span>'+s+'</span><span>'+s+'</span></div>';document.body.insertBefore(b,document.body.firstChild);}
+  /* pás s bežiacim textom (text, rýchlosť v sekundách, id) */
+  function makeStrip(text,secs,id){
+    var d=document.createElement('div'); d.className='hnrd-marq'; if(id)d.id=id;
+    d.style.setProperty('--sp',(secs||26)+'s');
+    d.innerHTML='<div class="t"><span>'+text+text+'</span><span>'+text+text+'</span></div>';
+    return d;
+  }
 
-  /* Roztiahnutie pásov na presnú šírku obrazovky (bez posunu, aj s posuvníkom) */
+  /* roztiahnutie pásov na presnú šírku obrazovky (bez posunu) */
   function bleed(){
     var w=document.documentElement.clientWidth;
-    ['hnrdMarq','hnrdRefl','hnrdIg'].forEach(function(id){
+    ['hnrdTop','hnrdMarq','hnrdRefl','hnrdIg'].forEach(function(id){
       var el=document.getElementById(id);if(!el)return;
       el.style.marginLeft='0'; el.style.width='auto';
       var l=el.getBoundingClientRect().left;
@@ -41,32 +62,24 @@
   }
   var bt; addEventListener('resize',function(){clearTimeout(bt);bt=setTimeout(bleed,120);});
 
-  function sections(){
-    var m=document.querySelector('main'); if(!m) return;
-    if(!document.getElementById('hnrdMarq')){
-      var mq=document.createElement('div');mq.className='hnrd-marq';mq.id='hnrdMarq';
-      var t=SPODNY;
-      mq.innerHTML='<div class="t"><span>'+t+t+'</span><span>'+t+t+'</span></div>';
-      m.appendChild(mq);
-    }
-    if(HOME && !document.getElementById('hnrdRefl')){
-      var i1=CDN+"52_hnrd-hoodie-black-white-reflective-zoom.jpg?ff=1&x=1024&y=768&q=85&ts=69ab399a&sg=161563f2";
-      var i2=CDN+"49_hnrd-hoodie-black-black-reflective-zoom.jpg?ff=1&x=1024&y=768&q=85&ts=69ab391e&sg=161563f2";
-      var s=document.createElement('section');s.className='hnrd-refl';s.id='hnrdRefl';
-      s.innerHTML='<div class="rh"><h2>REFLECTIVE</h2><div class="m">SERIES 02<br>GLOWS IN THE DARK</div></div><div class="hnrd-rg"><a class="rc" href="/hoodie-hnrd-white-reflective/"><img class="g" src="'+i1+'"><img class="bl" src="'+i1+'" aria-hidden="true"><span class="cap"><b>WHITE / REFLECTIVE</b><small>€90 · GLOWS IN THE DARK</small></span></a><a class="rc" href="/hoodie-hnrd-black-reflective/"><img class="g" src="'+i2+'"><img class="bl" src="'+i2+'" aria-hidden="true"><span class="cap"><b>BLACK / REFLECTIVE</b><small>€90 · GLOWS IN THE DARK</small></span></a></div>';
-      m.appendChild(s);
-      s.querySelectorAll('.rc').forEach(function(rc){rc.addEventListener('mousemove',function(e){var r=rc.getBoundingClientRect();rc.style.setProperty('--mx',(e.clientX-r.left)+'px');rc.style.setProperty('--my',(e.clientY-r.top)+'px');});});
-    }
-    if(HOME && !document.getElementById('hnrdIg')){
-      var posts = IGP.length ? IGP : FEED.map(function(u){return {img:CDN+u,link:IG};});
-      var g=document.createElement('section');g.className='hnrd-ig';g.id='hnrdIg';
-      g.innerHTML='<h2>FEED</h2><div class="hnrd-igg">'+posts.slice(0,8).map(function(p){return '<a class="igi" href="'+(p.link||IG)+'" target="_blank" rel="noopener"><img src="'+(p.img||FALLBACK)+'" loading="lazy" alt="HNRD Instagram" onerror="this.onerror=null;this.src=\''+FALLBACK+'\'"><span class="o">OPEN &#8599;</span></a>';}).join('')+'</div>';
-      m.appendChild(g);
-    }
-    bleed();
+  function reflective(m){
+    if(document.getElementById('hnrdRefl'))return;
+    var cards=R_KARTY.map(function(k){var img=k.img||FALLBACK;return '<a class="rc" href="'+(k.link||'#')+'"><img class="g" src="'+img+'"><img class="bl" src="'+img+'" aria-hidden="true"><span class="cap"><b>'+(k.titul||'')+'</b><small>'+(k.popis||'')+'</small></span></a>';}).join('');
+    var s=document.createElement('section');s.className='hnrd-refl';s.id='hnrdRefl';
+    s.innerHTML='<div class="rh"><h2>'+R_NAD+'</h2><div class="m">'+R_META+'</div></div><div class="hnrd-rg">'+cards+'</div>';
+    m.appendChild(s);
+    s.querySelectorAll('.rc').forEach(function(rc){rc.addEventListener('mousemove',function(e){var r=rc.getBoundingClientRect();rc.style.setProperty('--mx',(e.clientX-r.left)+'px');rc.style.setProperty('--my',(e.clientY-r.top)+'px');});});
   }
 
-  /* Točiace 3D logo v hlavičke — len na titulnej */
+  function feed(m){
+    if(document.getElementById('hnrdIg'))return;
+    var posts = IGP.length ? IGP : ["52_hnrd-hoodie-black-white-reflective.png","49_hnrd-hoodie-black-black-reflective.png","47_hnrd-hoodie-black-white.png","44_hnrd-hoodie-black-black.png","57_hnrd-tee-black.jpg","54_hnrd-tee-white.jpg","60_hnrd-cap-side.jpg","44_hnrd-hoodie-black-black.png"].map(function(u){return {img:CDN+u,link:IG};});
+    var g=document.createElement('section');g.className='hnrd-ig';g.id='hnrdIg';
+    g.innerHTML='<h2>FEED</h2><div class="hnrd-igg">'+posts.slice(0,8).map(function(p){return '<a class="igi" href="'+(p.link||IG)+'" target="_blank" rel="noopener"><img src="'+(p.img||FALLBACK)+'" loading="lazy" alt="HNRD Instagram" onerror="this.onerror=null;this.src=\''+FALLBACK+'\'"><span class="o">OPEN &#8599;</span></a>';}).join('')+'</div>';
+    m.appendChild(g);
+  }
+
+  /* točiace 3D logo v hlavičke */
   function navLogo(){
     var hl=document.querySelector('.header-logo img,.logo img,#logo img,header a img[src*="logo"]');
     if(!hl || document.getElementById('hnrdNav')) return;
@@ -81,13 +94,27 @@
     hl.style.display='none'; hl.parentNode.insertBefore(mv,hl);
   }
 
-  /* "Späť do obchodu" → malá šípka bez textu */
+  /* "Späť do obchodu" → malá šípka */
   function backBtn(){[].forEach.call(document.querySelectorAll('a,button'),function(el){if(!el.children.length&&/^\s*Späť do obchodu\s*$/i.test(el.textContent||'')){el.title='Späť do obchodu';el.textContent='←';el.style.fontSize='22px';el.style.lineHeight='1';el.style.textDecoration='none';}});}
 
-  function boot(){ ann(); sections(); navLogo(); backBtn(); }
+  function boot(){
+    navLogo(); backBtn();
+    var m=document.querySelector('main'); if(!m) return;
+    /* horný pás — na titulnej sa dostane pod veľké logo (logo sa vkladá pred neho) */
+    if(!document.getElementById('hnrdTop')){
+      var txt = PRODUCT ? PRODUKT : HORNY;
+      m.insertBefore(makeStrip(txt, RY_H, 'hnrdTop'), m.firstChild);
+    }
+    if(HOME){
+      if(!document.getElementById('hnrdMarq')) m.appendChild(makeStrip(SPODNY, RY_S, 'hnrdMarq'));
+      reflective(m);
+      feed(m);
+    }
+    bleed();
+  }
   if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
 
-  /* Režim otvorené / zatvorené */
+  /* režim otvorené / zatvorené */
   if(MODE==="lock"){
     if(enterBtn) enterBtn.style.display="none";
     if(soon) soon.style.display="block";

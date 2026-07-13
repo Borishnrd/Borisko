@@ -22,7 +22,7 @@ small,.code,.availability,.parameter,.btn,.navigation-in .menu-item,.footer,.bre
 @keyframes hnrdscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(max-width:760px){#hnrd-announce{display:none}}
 .hnrd-marq{background:var(--ink);color:#f7f5f1;overflow:hidden;padding:10px 0;margin:10px 0}
-.hnrd-marq .t{display:flex;white-space:nowrap;font-family:'Anton',sans-serif;font-size:clamp(18px,2.6vw,30px);animation:hnrdscroll 26s linear infinite}
+.hnrd-marq .t{display:flex;white-space:nowrap;font-family:'Anton',sans-serif;font-size:clamp(18px,2.6vw,30px);animation:hnrdscroll var(--sp,26s) linear infinite}
 .hnrd-marq .t span{padding:0 20px}
 .hnrd-marq,.hnrd-refl,.hnrd-ig{position:relative;box-sizing:border-box}
 .hnrd-refl *,.hnrd-ig *{box-sizing:border-box}
