@@ -105,7 +105,7 @@
   /* "Späť do obchodu" → malá šípka */
   function backBtn(){[].forEach.call(document.querySelectorAll('a,button'),function(el){if(!el.children.length&&/^\s*Späť do obchodu\s*$/i.test(el.textContent||'')){el.title='Späť do obchodu';el.textContent='←';el.style.fontSize='22px';el.style.lineHeight='1';el.style.textDecoration='none';}});}
 
-  /* čierne odznaky na kartách vybraných produktov (podľa URL) */
+  /* čierne odznaky — pod fotkou, nad názvom (neprekryjú produkt) */
   function badges(){
     var list=window.ODZNAKY||[]; if(!list.length)return;
     var cards=document.querySelectorAll('.p'); if(!cards.length)cards=document.querySelectorAll('.product');
@@ -116,9 +116,11 @@
       for(var i=0;i<list.length;i++){
         var key=((list[i].produkt||list[i].url||'')+'').trim();
         if(key && href.indexOf(key)>-1){
+          var b=document.createElement('div');b.className='hnrd-badge';b.textContent=(list[i].text||'NEW');
+          var name=card.querySelector('.name,.p-name,.product-name,h3,h2');
+          if(name&&name.parentNode){ name.parentNode.insertBefore(b,name); } else { card.appendChild(b); }
           if(getComputedStyle(card).position==='static')card.style.position='relative';
-          var b=document.createElement('span');b.className='hnrd-badge';b.textContent=(list[i].text||'NEW');
-          card.appendChild(b); break;
+          break;
         }
       }
     });
@@ -155,8 +157,22 @@
     });
   }
 
+  /* predobjednávkový pás na detaile produktu (pod tlačidlom Do košíka, nad Tlač/Opýtať sa) */
+  function preorder(){
+    var list=window.PREDOBJEDNAVKY||[]; if(!list.length || document.getElementById('hnrdPre'))return;
+    var btn=document.querySelector('.add-to-cart-button,button[name="add"],.btn-cart,.add-to-cart');
+    if(!btn)return;
+    var path=decodeURIComponent(location.pathname), hit=null;
+    for(var i=0;i<list.length;i++){var k=((list[i].produkt||'')+'').trim();if(k&&path.indexOf(k)>-1){hit=list[i];break;}}
+    if(!hit)return;
+    var host=btn.closest('form,.add-to-cart,.cart-buttons,.p-detail-add,.variant-submit')||btn.parentNode;
+    var strip=makeStrip('hnrdPre'); strip.classList.add('hnrd-pre');
+    host.parentNode.insertBefore(strip,host.nextSibling);
+    fillStrip(strip, hit.text||'PREDOBJEDNÁVKA ✦ ', hit.rychlost||16);
+  }
+
   function boot(){
-    navLogo(); backBtn(); ann(); badges(); sortSizes();
+    navLogo(); backBtn(); ann(); badges(); sortSizes(); preorder();
     var m=document.querySelector('main'); if(!m) return;
     if(HOME){
       if(!document.getElementById('hnrdMarq')){ var mq=makeStrip('hnrdMarq'); m.appendChild(mq); fillStrip(mq,SPODNY,RY_S); }
