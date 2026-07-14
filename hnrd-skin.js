@@ -157,26 +157,24 @@
     });
   }
 
-  /* predobjednávkový pás na detaile produktu (pod tlačidlom Do košíka, nad Tlač/Opýtať sa) */
-  function preorder(){
-    var list=window.PREDOBJEDNAVKY||[]; if(!list.length || document.getElementById('hnrdPre'))return;
-    var btn=document.querySelector('.add-to-cart-button,button[name="add"],.btn-cart,.add-to-cart');
-    if(!btn)return;
+  /* odznak na spodku hlavnej fotky na DETAILE produktu */
+  function detailBadge(){
+    var list=window.DETAIL_ODZNAKY||[]; if(!list.length || document.getElementById('hnrdDbadge'))return;
     var path=decodeURIComponent(location.pathname), hit=null;
     for(var i=0;i<list.length;i++){var k=((list[i].produkt||'')+'').trim();if(k&&path.indexOf(k)>-1){hit=list[i];break;}}
     if(!hit)return;
-    var host=btn;
-    while(host.parentNode && host.parentNode!==document.body){
-      var pd=getComputedStyle(host.parentNode).display;
-      if(pd.indexOf('flex')>-1||pd.indexOf('inline')>-1||pd.indexOf('grid')>-1){ host=host.parentNode; } else break;
-    }
-    var strip=makeStrip('hnrdPre'); strip.classList.add('hnrd-pre');
-    host.parentNode.insertBefore(strip,host.nextSibling);
-    fillStrip(strip, hit.text||'PREDOBJEDNÁVKA ✦ ', hit.rychlost||16);
+    if(!document.querySelector('.add-to-cart-button,button[name="add"],.btn-cart'))return;
+    var big=null,area=0;
+    [].forEach.call(document.querySelectorAll('img'),function(im){var r=im.getBoundingClientRect();var a=r.width*r.height;if(a>area&&r.width>150){area=a;big=im;}});
+    if(!big||!big.parentElement)return;
+    var box=big.parentElement;
+    if(getComputedStyle(box).position==='static')box.style.position='relative';
+    var b=document.createElement('div');b.id='hnrdDbadge';b.className='hnrd-dbadge';b.textContent=hit.text||'';
+    box.appendChild(b);
   }
 
   function boot(){
-    navLogo(); backBtn(); ann(); badges(); sortSizes(); preorder();
+    navLogo(); backBtn(); ann(); badges(); sortSizes(); detailBadge();
     var m=document.querySelector('main'); if(!m) return;
     if(HOME){
       if(!document.getElementById('hnrdMarq')){ var mq=makeStrip('hnrdMarq'); m.appendChild(mq); fillStrip(mq,SPODNY,RY_S); }
@@ -186,6 +184,7 @@
     bleed();
   }
   if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
+  addEventListener('load',function(){setTimeout(detailBadge,300);});
   try{ new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){for(var j=0;j<ms[i].addedNodes.length;j++){var n=ms[i].addedNodes[j];if(n.nodeType===1)sortSizes(n);}}}).observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
 
   /* režim otvorené / zatvorené */
