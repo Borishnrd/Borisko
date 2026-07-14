@@ -165,7 +165,11 @@
     var path=decodeURIComponent(location.pathname), hit=null;
     for(var i=0;i<list.length;i++){var k=((list[i].produkt||'')+'').trim();if(k&&path.indexOf(k)>-1){hit=list[i];break;}}
     if(!hit)return;
-    var host=btn.closest('form,.add-to-cart,.cart-buttons,.p-detail-add,.variant-submit')||btn.parentNode;
+    var host=btn;
+    while(host.parentNode && host.parentNode!==document.body){
+      var pd=getComputedStyle(host.parentNode).display;
+      if(pd.indexOf('flex')>-1||pd.indexOf('inline')>-1||pd.indexOf('grid')>-1){ host=host.parentNode; } else break;
+    }
     var strip=makeStrip('hnrdPre'); strip.classList.add('hnrd-pre');
     host.parentNode.insertBefore(strip,host.nextSibling);
     fillStrip(strip, hit.text||'PREDOBJEDNÁVKA ✦ ', hit.rychlost||16);
