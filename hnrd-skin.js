@@ -241,7 +241,7 @@
   if(document.readyState!=='loading') shopToggle(); else document.addEventListener('DOMContentLoaded',shopToggle);
 
   /* ===== TITULKA: tag (napíše sa a rozreže na línie) + oznámenie dropu ===== */
-  var TAG_URL="https://borishnrd.github.io/Borisko/hnrd-tag.svg?v=1", HERO_JS="https://borishnrd.github.io/Borisko/hnrd-hero.js?v=1";
+  var TAG_URL="https://borishnrd.github.io/Borisko/hnrd-tag.svg?v=1", HERO_JS="https://borishnrd.github.io/Borisko/hnrd-hero.js?v=2";
   function hero(){
     if(!HOME || document.getElementById('hnrdHero')) return;
     var m=document.querySelector('main'); if(!m) return;
@@ -259,10 +259,14 @@
     var rev=function(){ [].forEach.call(s.querySelectorAll('.reveal'),function(e,i){ setTimeout(function(){e.classList.add('in');},i*140); }); };
     function go(svgText){ window.HNRDTag.mount(s.querySelector('.hnrd-tagbox'),svgText,{lines:true,label:'HNRD',onDone:rev}); }
     function load(cb){ if(window.HNRDTag) return cb(); var sc=document.createElement('script'); sc.src=HERO_JS; sc.onload=cb; document.head.appendChild(sc); }
-    load(function(){
+    function start(){ load(function(){
       if(window.HNRD_TAG_SVG) return go(window.HNRD_TAG_SVG);
       fetch(TAG_URL).then(function(r){return r.text();}).then(go).catch(rev);
-    });
+    }); }
+    /* ak je otvorená landing page, tag sa začne písať až po ENTER THE SHOP (aby ho zákazník videl) */
+    var lp=landing && landing.style.display!=='none' && getComputedStyle(landing).display!=='none';
+    if(lp && MODE!=='lock' && enterBtn) enterBtn.addEventListener('click',function(){ setTimeout(start,750); });
+    else start();
   }
   if(document.readyState!=='loading') hero(); else document.addEventListener('DOMContentLoaded',hero);
 

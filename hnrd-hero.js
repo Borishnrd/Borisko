@@ -27,7 +27,7 @@
   function outExpo(t){return t===1?1:1-Math.pow(2,-10*t);}
   function anim(dur,fn,done){var t0=performance.now();(function f(n){var p=Math.min(1,(n-t0)/dur);fn(p);if(p<1)requestAnimationFrame(f);else if(done)done();})(t0);}
 
-  /* svgText = obsah SVG súboru tagu · opts.lines = po napísaní rozrezať na línie · opts.bands = počet línií */
+  /* svgText = obsah SVG súboru tagu · opts.lines = po napísaní sa na moment rozreže na línie a spojí späť · opts.bands = počet línií */
   function mount(box, svgText, opts){
     opts=opts||{};
     var src=new DOMParser().parseFromString(svgText,'image/svg+xml').documentElement;
@@ -53,9 +53,16 @@
     }
     var gapMax=H/N*(opts.gap||0.22);
     function setBands(gp,sh){ B.forEach(function(b,i){ b.r.setAttribute('y',b.y0+gp/2); b.r.setAttribute('height',Math.max(0,H/N-gp)); b.u.setAttribute('transform','translate('+((i%2?1:-1)*sh*(1+Math.abs(i-(N-1)/2)*.35)).toFixed(2)+' 0)'); }); }
+    /* línie len na moment: tag sa rozreže, pásy sa posunú do strán a potom sa zase spoja do celého tagu */
     function toLines(done){
       fill.style.display='none'; bands.style.display=''; setBands(0,0);
-      anim(900,function(p){var e=outExpo(p); setBands(gapMax*e,(W*0.012)*Math.sin(Math.PI*Math.min(1,p*1.15))*(1-p*.6)+W*0.0025*e);},done);
+      anim(420,function(p){var e=outExpo(p); setBands(gapMax*e, W*0.012*e);},function(){
+        setTimeout(function(){
+          anim(560,function(p){var e=ease(p); setBands(gapMax*(1-e), W*0.012*(1-e));},function(){
+            bands.style.display='none'; fill.style.display=''; if(done)done();
+          });
+        },260);
+      });
     }
     svg.append(fill,bands,out); box.appendChild(svg);
     var busy=false;
@@ -74,7 +81,7 @@
       }); },350);
     }
     svg.addEventListener('click',play);
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ brush.setAttribute('stroke-dashoffset','0'); if(opts.lines){ fill.style.display='none'; bands.style.display=''; setBands(gapMax,W*0.004); } out.style.opacity=0; if(opts.onDone)opts.onDone(); }
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ brush.setAttribute('stroke-dashoffset','0'); out.style.opacity=0; if(opts.onDone)opts.onDone(); }
     else if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); play(); } },{threshold:.35}); io.observe(svg); }
     else play();
     return {play:play};
