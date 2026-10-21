@@ -12,12 +12,12 @@
     '.hnrd-logo .band{fill:none;stroke:currentColor;stroke-linecap:butt;stroke-linejoin:round}' +
     '.hnrd-logo .hit{fill:transparent;cursor:pointer;pointer-events:all}' +
     /* text pod logom (ENTER THE SHOP) */
-    '.hnrd-logo .enter{position:absolute;left:0;right:0;text-align:center;font:700 clamp(11px,1.3vw,14px)/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.38em;text-transform:uppercase;color:inherit;pointer-events:none}' +
-    '.hnrd-logo .enter span{display:inline-block;position:relative;padding:14px 6px 14px calc(6px + .38em);cursor:pointer;pointer-events:auto;outline:none}' +
+    '.hnrd-logo .enter{position:absolute;left:0;right:0;text-align:center;font:700 clamp(15px,1.5vw,19px)/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.34em;text-transform:uppercase;color:inherit;pointer-events:none}' +
+    '.hnrd-logo .enter span{display:inline-block;position:relative;padding:16px 8px 16px calc(8px + .34em);cursor:pointer;pointer-events:auto;outline:none}' +
     '.hnrd-logo .enter i{display:inline-block;font-style:normal;opacity:0;transform:translateY(.9em);filter:blur(3px);transition:opacity .5s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1),filter .5s}' +
     '.hnrd-logo .enter.in i{opacity:1;transform:none;filter:none}' +
     '.hnrd-logo .enter.on span{animation:hnrdLpulse 2.2s ease-in-out infinite}' +
-    '.hnrd-logo .enter span::after{content:"";position:absolute;left:calc(6px + .38em);right:6px;bottom:6px;height:2px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.7,0,.2,1)}' +
+    '.hnrd-logo .enter span::after{content:"";position:absolute;left:calc(8px + .34em);right:8px;bottom:7px;height:2px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.7,0,.2,1)}' +
     '.hnrd-logo .enter.in span:hover::after,.hnrd-logo .enter.in span:focus-visible::after{transform:scaleX(1)}' +
     '.hnrd-logo .enter.in span:hover{animation:none}' +
     '.hnrd-logo .enter.off i{opacity:0;transform:translateY(-.6em);filter:blur(3px);transition-duration:.3s;transition-delay:0s!important}' +
@@ -64,7 +64,7 @@ function hnrdIntro(root, opt = {}) {
     let lh = D.h * lw / D.w, ly, gapT = 0, textSpace = 0;
     if (!o.mini && o.belowSpace) {
       // celok = logo + text + miesto pod ním (napr. INSTAGRAM, DAY/NIGHT) → vycentrovaný vo viditeľnej výške
-      const tsp = h => o.enterText ? Math.max(26, h * 0.12) + 40 : 0;
+      const tsp = h => o.enterText ? Math.max(26, h * 0.12) + 50 : 0;
       const maxH = R.height - o.belowSpace - 48;
       if (lh + tsp(lh) > maxH) { lh = Math.max(60, (maxH - (o.enterText ? 40 : 0)) / (o.enterText ? 1.12 : 1)); lw = lh * D.w / D.h; }
       gapT = o.enterText ? Math.max(26, lh * 0.12) : 0; textSpace = tsp(lh);
@@ -351,6 +351,8 @@ function hnrdIntro(root, opt = {}) {
       if (label) { label.classList.remove('on', 'off', 'in'); }
       const st0 = o.stagger, lastLine = (N - 1) * st0;
       const open0 = lastLine + 620;                 // úder: logo sa roztvorí z línií, od stredu von
+      // text (ENTER THE SHOP) sa začne vysúvať už počas roztvárania loga
+      const lblT = setTimeout(() => { if (label && alive && !entering) { label.classList.add('in'); setTimeout(() => alive && label.classList.add('on'), 900); } }, T(open0 + 350));
       await Promise.all(S.map((st, i) => assemble(st, o.alternate ? i % 2 === 0 : true,
         { line: i * st0 + [0, 40, -20, 30, -30, 20, -10][i % 7], open: open0 + Math.abs(i - (N - 1) / 2) * 55 })));
       settled = true;

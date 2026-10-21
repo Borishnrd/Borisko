@@ -270,7 +270,7 @@
       window.HNRDLogo.mount(box,{
         enterText: MODE==='lock' ? '' : (window.LANDING_TEXT || 'Enter the shop'),
         size: 0.7,
-        belowSpace: MODE==='lock' ? 250 : 120,
+        belowSpace: MODE==='lock' ? 280 : 150,
         onLayout: function(L){ if(intro) intro.style.top=Math.round(L.below+(MODE==='lock'?28:0))+'px'; },
         onEnter: function(){ if(enterBtn) enterBtn.click(); }
       });
