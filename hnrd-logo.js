@@ -43,6 +43,8 @@ function hnrdIntro(root, opt = {}) {
       shirtExit: false, // true = pri vstupe do shopu na chvíľu hrubé pásy cez obrazovku
       shopUrl: '',     // kam presmerovať (prázdne = len demo, logo sa znova zloží)
       clickAll: false, // true = klik na logo rozpadne CELÉ logo a znova ho poskladá (ako príchod/odchod)
+      belowSpace: 0,   // px pod logom a textom, ktoré treba nechať voľné (celok sa vycentruje)
+      onLayout: null,  // funkcia({below}) – kde (px od vrchu) začína miesto pod logom
       raise: 0,        // posun loga nahor (násobok výšky loga), napr. keď je pod ním COMING SOON
       onEnter: null,   // funkcia po rozpade pri vstupe (napr. zavretie landing page) – má prednosť pred shopUrl
       mini: false,     // malé logo (napr. v navigácii): vyplní box, línie letia len kúsok za jeho okraje
@@ -58,8 +60,18 @@ function hnrdIntro(root, opt = {}) {
     // ---- rozmery: logo v strede, na mobile väčšie, nikdy nie vyššie ako ~55 % výšky ----
     const R = root.getBoundingClientRect();
     const size = R.width < 700 ? Math.max(o.size, 0.88) : o.size;
-    const lw = o.mini ? Math.min(R.width, R.height * D.w / D.h) : Math.min(R.width * size, 1100, R.height * 0.55 * D.w / D.h), k = lw / D.w, lh = D.h * k;
-    const lx = (R.width - lw) / 2, ly = (R.height - lh) / 2 - (o.enterText ? lh * 0.06 : 0) - (o.raise || 0) * lh;
+    let lw = o.mini ? Math.min(R.width, R.height * D.w / D.h) : Math.min(R.width * size, 1100, R.height * 0.55 * D.w / D.h);
+    let lh = D.h * lw / D.w, ly, gapT = 0, textSpace = 0;
+    if (!o.mini && o.belowSpace) {
+      // celok = logo + text + miesto pod ním (napr. INSTAGRAM, DAY/NIGHT) → vycentrovaný vo viditeľnej výške
+      const tsp = h => o.enterText ? Math.max(26, h * 0.12) + 40 : 0;
+      const maxH = R.height - o.belowSpace - 48;
+      if (lh + tsp(lh) > maxH) { lh = Math.max(60, (maxH - (o.enterText ? 40 : 0)) / (o.enterText ? 1.12 : 1)); lw = lh * D.w / D.h; }
+      gapT = o.enterText ? Math.max(26, lh * 0.12) : 0; textSpace = tsp(lh);
+      ly = (R.height - (lh + textSpace + o.belowSpace)) / 2;
+    } else ly = (R.height - lh) / 2 - (o.enterText ? lh * 0.06 : 0) - (o.raise || 0) * lh;
+    const k = lw / D.w, lx = (R.width - lw) / 2;
+    if (o.onLayout) setTimeout(() => o.onLayout({ below: ly + lh + textSpace }), 0);
   
     const svg = el('svg', { viewBox: `0 0 ${R.width} ${R.height}`, role: 'img', 'aria-label': 'HNRD' });
     const defs = el('defs'), g = el('g');
@@ -315,7 +327,7 @@ function hnrdIntro(root, opt = {}) {
       btn.setAttribute('aria-label', o.enterText);
       [...o.enterText].forEach((ch, j) => { const c = document.createElement('i'); c.textContent = ch === ' ' ? '\u00a0' : ch; c.style.transitionDelay = (j * 28) + 'ms'; btn.appendChild(c); });
       label.appendChild(btn);
-      label.style.top = Math.min(R.height - 56, ly + lh + Math.max(32, lh * 0.16)) + 'px';
+      label.style.top = (o.belowSpace ? ly + lh + gapT - 14 : Math.min(R.height - 56, ly + lh + Math.max(32, lh * 0.16))) + 'px';
       root.appendChild(label);
       const go = async () => {
         if (entering || !label.classList.contains('in')) return;
