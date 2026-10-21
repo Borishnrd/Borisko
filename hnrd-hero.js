@@ -52,7 +52,7 @@
       var gg=el('g',{'clip-path':'url(#'+id+'c'+i+')'}); var u=el('use',{href:'#'+id+'s'}); gg.appendChild(u); bands.appendChild(gg); B.push({r:r,u:u,y0:vb[1]+H*i/N});
     }
     var gapMax=H/N*(opts.gap||0.22);
-    function setBands(gp,sh){ B.forEach(function(b,i){ b.r.setAttribute('y',b.y0+gp/2); b.r.setAttribute('height',Math.max(0,H/N-gp)); b.u.setAttribute('transform','translate('+((i%2?1:-1)*sh*(1+Math.abs(i-(N-1)/2)*.35)).toFixed(2)+' 0)'); }); }
+    function setBands(gp,sh){ B.forEach(function(b,i){ b.r.setAttribute('y',b.y0+gp/2-0.4); b.r.setAttribute('height',Math.max(0,H/N-gp+0.8));   /* +0.8 prekrytie = žiadne tenké čiarky medzi pásmi */ b.u.setAttribute('transform','translate('+((i%2?1:-1)*sh*(1+Math.abs(i-(N-1)/2)*.35)).toFixed(2)+' 0)'); }); }
     /* línie len na moment: tag sa rozreže, pásy sa posunú do strán a potom sa zase spoja do celého tagu */
     function toLines(done){
       fill.style.display='none'; bands.style.display=''; setBands(0,0);
