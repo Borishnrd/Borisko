@@ -40,7 +40,8 @@
   function setVH(){var h=(window.visualViewport&&window.visualViewport.height)?window.visualViewport.height:window.innerHeight;document.documentElement.style.setProperty('--vh',h+'px');}
   setVH(); addEventListener('resize',setVH); addEventListener('orientationchange',setVH);
 
-  function insLogo(){if(!HOME)return;var m=document.querySelector('main');if(m&&shopLogo){shopLogo.style.display='block';var bar=document.getElementById('hnrd-announce');if(bar&&bar.parentNode===m){m.insertBefore(shopLogo,bar.nextSibling);}else{m.insertBefore(shopLogo,m.firstChild);}}}
+  /* veľké logo nad sekciou ALL na titulke je zrušené (logo je teraz animované v navigácii) */
+  function insLogo(){ if(shopLogo) shopLogo.style.display='none'; }
 
   /* prázdny pás */
   function makeStrip(id){
@@ -87,19 +88,34 @@
     m.appendChild(g);
   }
 
-  /* točiace 3D logo v hlavičke */
+  /* logo z línií v hlavičke (rovnaká animácia ako na landing page) */
+  var LOGO_JS = "https://borishnrd.github.io/Borisko/hnrd-logo.js?v=1";
+  function withLogo(cb){
+    if(window.HNRDLogo) return cb();
+    var s=document.getElementById('hnrdLogoJs');
+    if(!s){ s=document.createElement('script'); s.id='hnrdLogoJs'; s.src=LOGO_JS; s.async=true; document.head.appendChild(s); }
+    s.addEventListener('load',function(){ if(window.HNRDLogo) cb(); });
+  }
   function navLogo(){
     var hl=document.querySelector('.header-logo img,.logo img,#logo img,header a img[src*="logo"]');
     if(!hl || document.getElementById('hnrdNav')) return;
-    var w=hl.offsetWidth||150, h=hl.offsetHeight||56;
-    var mv=document.createElement('model-viewer');
-    mv.id='hnrdNav'; mv.setAttribute('src',GLB);
-    mv.setAttribute('auto-rotate',''); mv.setAttribute('auto-rotate-delay','0');
-    mv.setAttribute('rotation-per-second','40deg'); mv.setAttribute('interaction-prompt','none');
-    mv.setAttribute('disable-zoom',''); mv.setAttribute('loading','eager');
-    mv.setAttribute('camera-orbit','0deg 82deg auto');
-    mv.style.cssText='width:'+w+'px;height:'+h+'px;background:transparent;pointer-events:none';
-    hl.style.display='none'; hl.parentNode.insertBefore(mv,hl);
+    function go(){
+      var r=hl.getBoundingClientRect(), w=Math.round(r.width)||150, h=Math.round(r.height)||56;
+      var box=document.createElement('span');
+      box.id='hnrdNav'; box.setAttribute('aria-label','HNRD');
+      box.style.cssText='display:inline-block;vertical-align:middle;width:'+w+'px;height:'+h+'px;color:var(--ink,#000)';
+      hl.parentNode.insertBefore(box,hl); hl.style.display='none';
+      /* animácia z línií len pri prvej stránke v návšteve, potom rovno hotové logo */
+      var first=true; try{ first=!sessionStorage.getItem('hnrdNavAnim'); sessionStorage.setItem('hnrdNavAnim','1'); }catch(e){}
+      withLogo(function(){ window.HNRDLogo.mount(box,{ mini:true, animate:first, stagger:70, thin:1, speed:1.25 }); });
+    }
+    function start(){ if(hl.complete && hl.naturalWidth) go(); else { hl.addEventListener('load',go); setTimeout(function(){ if(!document.getElementById('hnrdNav')) go(); },1500); } }
+    /* ak sa práve ukazuje landing page, logo sa poskladá až po kliknutí na ENTER (aby ho bolo vidieť) */
+    var nv=performance.getEntriesByType('navigation')[0], rel=nv?nv.type==='reload':false, visited=false;
+    try{ visited=!!localStorage.getItem('landingVisited'); }catch(e){}
+    if(HOME && landing && MODE!=='lock' && enterBtn && (!visited || rel)){
+      enterBtn.addEventListener('click',function(){ setTimeout(start,650); });
+    } else start();
   }
 
   /* "Späť do obchodu" → malá šípka */
@@ -198,4 +214,63 @@
     if(landing && localStorage.getItem('landingVisited') && !isR){ landing.style.display='none'; insLogo(); }
     if(enterBtn) enterBtn.addEventListener('click',function(){ landing.style.opacity='0'; setTimeout(function(){ landing.style.display='none'; insLogo(); },700); localStorage.setItem('landingVisited','true'); });
   }
+
+  /* ===== DAY / NIGHT pre celý web (fosforový nočný režim) ===== */
+  var MODE_TGS=[];
+  /* NIGHT_CELY_WEB = true → nočný režim na celom webe; inak len na landing page */
+  var NIGHT_ALL = window.NIGHT_CELY_WEB===true;
+  window.hnrdSetMode=function(m,anim){
+    var de=NIGHT_ALL ? document.documentElement : landing; if(!de) return;
+    de.classList.toggle('hnrd-night',m==='night');
+    if(anim && m==='night'){ de.classList.remove('hnrd-charge'); void de.offsetWidth; de.classList.add('hnrd-charge'); }
+    MODE_TGS.forEach(function(tg){ [].forEach.call(tg.children,function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-m')===m); }); });
+    try{ localStorage.setItem('hnrdMode',m); }catch(e){}
+  };
+  function modeToggle(parent,cls){
+    var tg=document.createElement('div'); tg.className='hnrd-mode '+(cls||''); tg.setAttribute('role','group'); tg.setAttribute('aria-label','DAY / NIGHT');
+    tg.innerHTML='<button type="button" data-m="day">DAY</button><button type="button" data-m="night">NIGHT</button>';
+    [].forEach.call(tg.children,function(b){ b.addEventListener('click',function(){ window.hnrdSetMode(b.getAttribute('data-m'),true); }); });
+    parent.appendChild(tg); MODE_TGS.push(tg);
+    var m='day'; try{ m=localStorage.getItem('hnrdMode')||'day'; }catch(e){}
+    window.hnrdSetMode(m,false);
+    return tg;
+  }
+  function shopToggle(){ if(NIGHT_ALL && !document.getElementById('hnrdModeShop')){ var t=modeToggle(document.body,'hnrd-mode-shop'); t.id='hnrdModeShop'; } }
+  if(document.readyState!=='loading') shopToggle(); else document.addEventListener('DOMContentLoaded',shopToggle);
+
+  /* ===== NEW DROP / OLD DROP – sekcie produktov (nastavuje sa v Pätičke: window.NEW_DROP) ===== */
+  function drops(){
+    var cfg=window.NEW_DROP||{}, keys=(cfg.produkty||[]).map(function(x){return (''+x).trim();}).filter(Boolean);
+    if(!keys.length || document.getElementById('hnrdNewDrop')) return;
+    var cards=[].slice.call(document.querySelectorAll('.p')); if(!cards.length) return;
+    var grid=cards[0].parentNode;
+    var isNew=function(c){ var a=c.querySelector('a[href]'), h=a?a.getAttribute('href')||'':''; return keys.some(function(k){return h.indexOf(k)>-1;}); };
+    var news=cards.filter(isNew); if(!news.length) return;
+    var g2=grid.cloneNode(false); g2.removeAttribute('id');
+    news.forEach(function(c){ g2.appendChild(c); });
+    function head(id,txt){ var h=document.createElement('div'); h.id=id; h.className='hnrd-drop-h'; h.innerHTML='<h2>'+txt+'</h2>'; return h; }
+    grid.parentNode.insertBefore(head('hnrdNewDrop',cfg.nadpis||'NEW DROP'),grid);
+    grid.parentNode.insertBefore(g2,grid);
+    if(grid.querySelector('.p')) grid.parentNode.insertBefore(head('hnrdOldDrop',window.OLD_DROP_NADPIS||'OLD DROP'),grid);
+  }
+  if(document.readyState!=='loading') drops(); else document.addEventListener('DOMContentLoaded',drops);
+
+  /* ===== nová landing page: logo z línií namiesto 3D modelu ===== */
+  function landingIntro(){
+    if(!landing || landing.style.display==='none' || document.getElementById('hnrd-landing-logo')) return;
+    var host=document.getElementById('hnrd-landing');
+    if(!host){ host=document.createElement('div'); host.id='hnrd-landing'; landing.insertBefore(host,landing.firstChild); }
+    var im=landing.querySelector('.hnrd-im'); if(im) im.style.display='none';
+    var box=document.createElement('div'); box.id='hnrd-landing-logo'; host.appendChild(box);
+    modeToggle(landing,'hnrd-mode-landing');   /* DAY / NIGHT prepínač */
+    withLogo(function(){
+      window.HNRDLogo.mount(box,{
+        enterText: MODE==='lock' ? '' : (window.LANDING_TEXT || 'Enter the shop'),
+        size: MODE==='lock' ? 0.6 : 0.7,
+        raise: MODE==='lock' ? 0.22 : 0,
+        onEnter: function(){ if(enterBtn) enterBtn.click(); }
+      });
+    });
+  }
+  if(document.readyState!=='loading') landingIntro(); else document.addEventListener('DOMContentLoaded',landingIntro);
 })();

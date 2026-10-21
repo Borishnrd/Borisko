@@ -70,3 +70,57 @@ small,.code,.availability,.parameter,.btn,.navigation-in .menu-item,.footer,.bre
 .hnrd-iglink{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;color:var(--dim);text-decoration:none;transition:.3s}.hnrd-iglink:hover{color:var(--ink)}
 .siteCookies{z-index:1000001!important}.siteCookies,.siteCookies *{pointer-events:auto!important}
 #shop-logo{position:relative;width:300px;height:220px;margin:0 auto -105px;z-index:5;overflow:hidden}
+/* ===== nová landing page (logo z línií) ===== */
+#landing-page{background:#fff;color:#000;transition:opacity .7s ease-in-out,background-color .9s ease,color .9s ease}
+#hnrd-landing{position:absolute;inset:0}
+#hnrd-landing-logo.hnrd-logo{position:absolute;inset:0}
+#landing-page .hnrd-intro{position:absolute;left:0;right:0;bottom:calc(74px + env(safe-area-inset-bottom));gap:14px;pointer-events:none}
+#landing-page .hnrd-intro>*{pointer-events:auto}
+#landing-page .hnrd-enter{display:none!important}
+#landing-page .hnrd-soon{color:inherit;text-align:center}
+#landing-page .hnrd-iglink{color:inherit;opacity:.5}
+#landing-page .hnrd-iglink:hover{opacity:1;color:inherit}
+
+/* ===== DAY / NIGHT prepínač ===== */
+.hnrd-mode{display:flex;gap:4px;padding:4px;border-radius:999px;border:1px solid var(--line,rgba(0,0,0,.18));background:color-mix(in srgb,var(--bg,#fff) 75%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.25em;color:var(--ink,#000);transition:border-color .9s,background-color .9s,color .9s}
+.hnrd-mode button{all:unset;cursor:pointer;padding:8px 11px 8px calc(11px + .25em);border-radius:999px;color:inherit;opacity:.45;transition:opacity .3s,background-color .5s,color .5s}
+.hnrd-mode button:hover{opacity:.8}
+.hnrd-mode button[aria-pressed="true"]{opacity:1;background:var(--ink,#000);color:var(--bg,#fff)}
+.hnrd-mode button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.hnrd-mode-landing{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:3}
+#landing-page .hnrd-mode{background:transparent;border-color:rgba(0,0,0,.18);color:inherit}
+#landing-page .hnrd-mode button[aria-pressed="true"]{background:#000;color:#fff}
+.hnrd-mode-shop{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:900}
+
+/* ===== NEW DROP / OLD DROP nadpisy ===== */
+.hnrd-drop-h{padding:28px 0 12px}
+.hnrd-drop-h h2{margin:0;font-family:'Anton',sans-serif!important;font-size:clamp(30px,6vw,58px);line-height:.9;letter-spacing:.01em;color:var(--ink)}
+#hnrdOldDrop{margin-top:34px}
+
+/* ===== NIGHT – fosforový režim celého webu ===== */
+html{transition:background-color .9s ease}
+html.hnrd-night{--bg:#060706!important;--bg2:#0c0f0b;--panel:#0c0f0b;--ink:#d6ffbf;--dim:rgba(214,255,191,.55);--line:rgba(214,255,191,.18);--glow:0 0 6px rgb(170 255 130 / .7),0 0 18px rgb(120 255 90 / .3);background:#060706!important;color-scheme:dark}
+html.hnrd-night body{background:#060706!important;color:var(--ink)!important}
+html.hnrd-night body *{border-color:var(--line)}
+html.hnrd-night #header,html.hnrd-night header,html.hnrd-night .header-top,html.hnrd-night .top-navigation-bar,html.hnrd-night .navigation-in,html.hnrd-night .navigation-in ul,html.hnrd-night .menu-helper,html.hnrd-night .navigation-wrapper,html.hnrd-night #footer,html.hnrd-night footer,html.hnrd-night .footer,html.hnrd-night .footer-bottom,html.hnrd-night .sidebar,html.hnrd-night .content-wrapper,html.hnrd-night .container,html.hnrd-night .overall-wrapper,html.hnrd-night .user-action,html.hnrd-night .popup-widget,html.hnrd-night .cart-widget,html.hnrd-night .dropdown,html.hnrd-night .search,html.hnrd-night .breadcrumbs{background-color:transparent!important;color:var(--ink)!important}
+html.hnrd-night a,html.hnrd-night .navigation-in .menu-item,html.hnrd-night .navigation-in a,html.hnrd-night header a,html.hnrd-night #header a,html.hnrd-night .footer a{color:var(--ink)!important}
+html.hnrd-night svg:not(.hnrd-logo svg) use,html.hnrd-night header svg:not(.hnrd-logo svg){fill:var(--ink)!important;color:var(--ink)!important}
+html.hnrd-night h1,html.hnrd-night h2,html.hnrd-night h3,html.hnrd-night .p .name,html.hnrd-night .product .name,html.hnrd-night .price-final,html.hnrd-night .price,html.hnrd-night .hnrd-drop-h h2,html.hnrd-night .navigation-in a{text-shadow:var(--glow)}
+html.hnrd-night input,html.hnrd-night select,html.hnrd-night textarea{background:#0c0f0b!important;color:var(--ink)!important;border-color:var(--line)!important}
+html.hnrd-night .p{background-color:rgba(20,26,18,.55)!important}
+html.hnrd-night .p:hover{background-color:rgba(30,40,26,.75)!important;box-shadow:0 0 0 1px rgba(170,255,130,.25),0 0 24px rgba(120,255,90,.12)}
+html.hnrd-night .p .image img{filter:brightness(.92)}
+html.hnrd-night .btn,html.hnrd-night .add-to-cart-button,html.hnrd-night .btn-cart,html.hnrd-night .btn-primary,html.hnrd-night .btn-conversion,html.hnrd-night button.add-to-cart-button{background-color:var(--ink)!important;color:#060706!important;box-shadow:0 0 14px rgb(150 255 110 / .45)}
+html.hnrd-night .hnrd-badge,html.hnrd-night .hnrd-dbadge{background:var(--ink);color:#060706;box-shadow:0 0 10px rgb(150 255 110 / .5)}
+html.hnrd-night #hnrd-announce,html.hnrd-night .hnrd-marq{background:var(--ink);color:#060706;box-shadow:0 0 22px rgb(150 255 110 / .35)}
+html.hnrd-night .hnrd-refl .rh h2,html.hnrd-night .hnrd-refl .rh .m,html.hnrd-night .hnrd-ig h2{color:var(--ink);text-shadow:var(--glow)}
+html.hnrd-night #hnrdNav svg{filter:drop-shadow(0 0 2px rgb(190 255 150 / .9)) drop-shadow(0 0 8px rgb(120 255 90 / .45))}
+html.hnrd-night .siteCookies{background:#0c0f0b!important;color:var(--ink)!important}
+/* landing v noci */
+html.hnrd-night #landing-page,#landing-page.hnrd-night{background:#060706;color:#d6ffbf}
+html.hnrd-night #landing-page .hnrd-soon,#landing-page.hnrd-night .hnrd-soon{text-shadow:0 0 6px rgb(170 255 130 / .7),0 0 18px rgb(120 255 90 / .3)}
+html.hnrd-night #landing-page .hnrd-mode,#landing-page.hnrd-night .hnrd-mode{border-color:rgba(214,255,191,.25)}
+html.hnrd-night #landing-page .hnrd-mode button[aria-pressed="true"],#landing-page.hnrd-night .hnrd-mode button[aria-pressed="true"],html.hnrd-night .hnrd-mode button[aria-pressed="true"]{background:#d6ffbf;color:#060706;box-shadow:0 0 12px rgb(150 255 110 / .55)}
+/* "nabitie" pri prepnutí na NIGHT */
+html.hnrd-charge main,html.hnrd-charge header,html.hnrd-charge #hnrd-announce{animation:hnrdCharge 1.3s ease-out}
+@keyframes hnrdCharge{0%{filter:brightness(.25)}12%{filter:brightness(1.15)}22%{filter:brightness(.6)}38%{filter:brightness(1)}100%{filter:none}}
