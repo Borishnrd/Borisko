@@ -240,17 +240,50 @@
   function shopToggle(){ if(NIGHT_ALL && !document.getElementById('hnrdModeShop')){ var t=modeToggle(document.body,'hnrd-mode-shop'); t.id='hnrdModeShop'; } }
   if(document.readyState!=='loading') shopToggle(); else document.addEventListener('DOMContentLoaded',shopToggle);
 
+  /* ===== TITULKA: tag (napíše sa a rozreže na línie) + oznámenie dropu ===== */
+  var TAG_URL="https://borishnrd.github.io/Borisko/hnrd-tag.svg?v=1", HERO_JS="https://borishnrd.github.io/Borisko/hnrd-hero.js?v=1";
+  function hero(){
+    if(!HOME || document.getElementById('hnrdHero')) return;
+    var m=document.querySelector('main'); if(!m) return;
+    var O=window.OZNAM||{};
+    var s=document.createElement('section'); s.className='hnrd-hero'; s.id='hnrdHero';
+    s.innerHTML='<div class="hnrd-tagbox"></div>'+
+      (O.vypnut?'':'<div class="hnrd-ann2">'+
+        '<div class="k reveal">'+(O.male||'DROP 02')+'</div>'+
+        '<div class="t reveal">'+(O.velke||'VERY SOON')+'</div>'+
+        '<div class="s reveal">'+(O.popis||'STRIPED TEES ✦ GLOW-IN-THE-DARK HOODIE')+'</div>'+
+        '<a class="ig reveal" href="'+(O.link||IG)+'" target="_blank" rel="noopener">'+(O.tlacidlo||'FOLLOW @HNRD.WORLDWIDE FOR INFO')+' <i>→</i></a>'+
+      '</div>');
+    var bar=document.getElementById('hnrd-announce');
+    if(bar && bar.parentNode===m) m.insertBefore(s,bar.nextSibling); else m.insertBefore(s,m.firstChild);
+    var rev=function(){ [].forEach.call(s.querySelectorAll('.reveal'),function(e,i){ setTimeout(function(){e.classList.add('in');},i*140); }); };
+    function go(svgText){ window.HNRDTag.mount(s.querySelector('.hnrd-tagbox'),svgText,{lines:true,label:'HNRD',onDone:rev}); }
+    function load(cb){ if(window.HNRDTag) return cb(); var sc=document.createElement('script'); sc.src=HERO_JS; sc.onload=cb; document.head.appendChild(sc); }
+    load(function(){
+      if(window.HNRD_TAG_SVG) return go(window.HNRD_TAG_SVG);
+      fetch(TAG_URL).then(function(r){return r.text();}).then(go).catch(rev);
+    });
+  }
+  if(document.readyState!=='loading') hero(); else document.addEventListener('DOMContentLoaded',hero);
+
   /* ===== NEW DROP / OLD DROP – sekcie produktov (nastavuje sa v Pätičke: window.NEW_DROP) ===== */
   function drops(){
     var cfg=window.NEW_DROP||{}, keys=(cfg.produkty||[]).map(function(x){return (''+x).trim();}).filter(Boolean);
-    if(!keys.length || document.getElementById('hnrdNewDrop')) return;
-    var cards=[].slice.call(document.querySelectorAll('.p')); if(!cards.length) return;
-    var grid=cards[0].parentNode;
-    var isNew=function(c){ var a=c.querySelector('a[href]'), h=a?a.getAttribute('href')||'':''; return keys.some(function(k){return h.indexOf(k)>-1;}); };
-    var news=cards.filter(isNew); if(!news.length) return;
+    if(document.getElementById('hnrdNewDrop') || document.getElementById('hnrdOldDrop')) return;
+    var ps=[].slice.call(document.querySelectorAll('.p')); if(!ps.length) return;
+    /* v Shoptete je karta .p zabalená v .product a tie sú v mriežke .products */
+    var wrap=function(p){ return p.closest('.product') || p; };
+    var first=wrap(ps[0]), grid=ps[0].closest('.products') || first.parentNode;
+    if(!grid || !grid.parentNode) return;
+    function head(id,txt){ var h=document.createElement('div'); h.id=id; h.className='hnrd-drop-h'; h.innerHTML='<h2>'+txt+'</h2>'; return h; }
+    if(!keys.length){   /* nový drop ešte nie je v obchode → len nadpis nad súčasnými produktmi (napr. DROP 01) */
+      if(HOME && window.OLD_DROP_NADPIS) grid.parentNode.insertBefore(head('hnrdOldDrop',window.OLD_DROP_NADPIS),grid);
+      return;
+    }
+    var isNew=function(p){ var a=p.querySelector('a[href]'), h=a?a.getAttribute('href')||'':''; return keys.some(function(k){return h.indexOf(k)>-1;}); };
+    var news=ps.filter(isNew).map(wrap); if(!news.length) return;
     var g2=grid.cloneNode(false); g2.removeAttribute('id');
     news.forEach(function(c){ g2.appendChild(c); });
-    function head(id,txt){ var h=document.createElement('div'); h.id=id; h.className='hnrd-drop-h'; h.innerHTML='<h2>'+txt+'</h2>'; return h; }
     grid.parentNode.insertBefore(head('hnrdNewDrop',cfg.nadpis||'NEW DROP'),grid);
     grid.parentNode.insertBefore(g2,grid);
     if(grid.querySelector('.p')) grid.parentNode.insertBefore(head('hnrdOldDrop',window.OLD_DROP_NADPIS||'OLD DROP'),grid);
