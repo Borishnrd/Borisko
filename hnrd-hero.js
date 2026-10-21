@@ -56,12 +56,12 @@
     /* línie len na moment: tag sa rozreže, pásy sa posunú do strán a potom sa zase spoja do celého tagu */
     function toLines(done){
       fill.style.display='none'; bands.style.display=''; setBands(0,0);
-      anim(420,function(p){var e=outExpo(p); setBands(gapMax*e, W*0.012*e);},function(){
+      anim(330,function(p){var e=outExpo(p); setBands(gapMax*e, W*0.012*e);},function(){
         setTimeout(function(){
-          anim(560,function(p){var e=ease(p); setBands(gapMax*(1-e), W*0.012*(1-e));},function(){
+          anim(495,function(p){var e=ease(p); setBands(gapMax*(1-e), W*0.012*(1-e));},function(){
             bands.style.display='none'; fill.style.display=''; if(done)done();
           });
-        },260);
+        },160);
       });
     }
     svg.append(fill,bands,out); box.appendChild(svg);
@@ -73,16 +73,16 @@
       os.forEach(function(p){p.setAttribute('stroke-dashoffset','1');}); brush.setAttribute('stroke-dashoffset','1');
       fill.style.display=''; bands.style.display='none';
       /* pero (obrys) ide mierne popredu, sprej (výplň) hneď za ním – ako keď sa tag píše */
-      anim(1700,function(p){var e=ease(p);os.forEach(function(q){q.setAttribute('stroke-dashoffset',(1-e).toFixed(4));});});
-      setTimeout(function(){ anim(1700,function(p){brush.setAttribute('stroke-dashoffset',(1-ease(p)).toFixed(4));},function(){
+      anim(1420,function(p){var e=ease(p);os.forEach(function(q){q.setAttribute('stroke-dashoffset',(1-e).toFixed(4));});});
+      setTimeout(function(){ anim(1420,function(p){brush.setAttribute('stroke-dashoffset',(1-ease(p)).toFixed(4));},function(){
         out.style.transition='opacity .6s'; out.style.opacity=0;
         var fin=function(){ busy=false; if(opts.onDone)opts.onDone(); };
-        if(opts.lines) setTimeout(function(){ toLines(fin); },250); else fin();
-      }); },350);
+        if(opts.lines) setTimeout(function(){ toLines(fin); },180); else fin();
+      }); },250);
     }
     svg.addEventListener('click',play);
     if(matchMedia('(prefers-reduced-motion: reduce)').matches){ brush.setAttribute('stroke-dashoffset','0'); out.style.opacity=0; if(opts.onDone)opts.onDone(); }
-    else if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); play(); } },{threshold:.35}); io.observe(svg); }
+    else if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); play(); } },{threshold:.2}); io.observe(svg); }
     else play();
     return {play:play};
   }

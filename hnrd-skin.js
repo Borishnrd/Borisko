@@ -241,7 +241,7 @@
   if(document.readyState!=='loading') shopToggle(); else document.addEventListener('DOMContentLoaded',shopToggle);
 
   /* ===== TITULKA: tag (napíše sa a rozreže na línie) + oznámenie dropu ===== */
-  var TAG_URL="https://borishnrd.github.io/Borisko/hnrd-tag.svg?v=1", HERO_JS="https://borishnrd.github.io/Borisko/hnrd-hero.js?v=3";
+  var TAG_URL="https://borishnrd.github.io/Borisko/hnrd-tag.svg?v=1", HERO_JS="https://borishnrd.github.io/Borisko/hnrd-hero.js?v=7";
   function hero(){
     if(!HOME || document.getElementById('hnrdHero')) return;
     var m=document.querySelector('main'); if(!m) return;
@@ -258,11 +258,11 @@
     var bar=document.getElementById('hnrd-announce');
     if(bar && bar.parentNode===m) m.insertBefore(s,bar.nextSibling); else m.insertBefore(s,m.firstChild);
     var rev=function(){ [].forEach.call(s.querySelectorAll('.reveal'),function(e,i){ setTimeout(function(){e.classList.add('in');},i*140); }); };
-    function go(svgText){ window.HNRDTag.mount(s.querySelector('.hnrd-tagbox'),svgText,{lines:true,label:'HNRD',onDone:rev}); }
+    function go(svgText){ window.HNRDTag.mount(s.querySelector('.hnrd-tagbox'),svgText,{lines:true,label:'HNRD'}); }
     function load(cb){ if(window.HNRDTag) return cb(); var sc=document.getElementById('hnrdHeroJs'); if(!sc){ sc=document.createElement('script'); sc.id='hnrdHeroJs'; sc.src=HERO_JS; document.head.appendChild(sc); } sc.addEventListener('load',function(){ cb(); }); }
     function show(){ s.style.visibility=''; }
     function start(){ load(function(){
-      show();
+      show(); rev();   /* oznámenie sa ukáže hneď, tag sa píše popri ňom */
       if(window.HNRD_TAG_SVG) return go(window.HNRD_TAG_SVG);
       fetch(TAG_URL).then(function(r){return r.text();}).then(go).catch(rev);
     }); }
@@ -270,7 +270,7 @@
     load(function(){});
     /* ak je otvorená landing page, tag sa začne písať až po ENTER THE SHOP (aby ho zákazník videl) */
     var lp=landing && landing.style.display!=='none' && getComputedStyle(landing).display!=='none';
-    if(lp && MODE!=='lock' && enterBtn) enterBtn.addEventListener('click',function(){ setTimeout(start,750); });
+    if(lp && MODE!=='lock' && enterBtn) enterBtn.addEventListener('click',function(){ setTimeout(start,250); });
     else start();
   }
   if(document.readyState!=='loading') hero(); else document.addEventListener('DOMContentLoaded',hero);
